@@ -5,6 +5,8 @@ on:
     # 北京时间 09:30 与 21:30（GitHub Actions 使用 UTC）
     - cron: "30 1 * * *"
     - cron: "30 13 * * *"
+    # 每周一 北京时间 11:00 触发一次空提交，防止公开仓库 60 天无活动导致定时任务被自动停用
+    - cron: "0 3 * * 1"
   workflow_dispatch:
 
 concurrency:
@@ -37,5 +39,24 @@ jobs:
           GLADOS_COOKIE: ${{ secrets.COOKIES }}
           PUSHPLUS: ${{ secrets.PUSHPLUS }}
         run: |
-          python glados_checkin.py --quiet
-          echo "exit=$?" >> "$GITHUB_STEP_SUMMARY"
+          python glados_checkin.py --quiet 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # keepalive：公开仓库中，若 60 天无仓库活动，GitHub 会自动停用 scheduled workflow。
+  # 每周一空提交一次，制造"活动"，使定时签到永久无人值守。
+  # 仅在周一 cron（0 3 * * 1）触发时运行；手动 dispatch / 每日签到触发时不运行。
+  keepalive:
+    if: github.event.schedule == '0 3 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Weekly keepalive commit
+        run: |
+          git config user.name "GLaDOS Keepalive"
+          git config user.email "keepalive@example.com"
+          git commit --allow-empty -m "chore: keepalive (prevent scheduled workflow auto-disable)"
+          git push

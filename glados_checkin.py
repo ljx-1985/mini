@@ -694,6 +694,15 @@ def main(argv: list[str] | None = None) -> int:
     if not args.no_notify:
         send_notifications(cfg, title, content, logger)
 
+    # 结构化摘要：始终输出到 stdout（不受 --quiet 影响），供 CI job summary 抓取
+    accts = "; ".join(
+        f"#{r['index']} {r['email'] or '未知'} {r['status']}"
+        + (f" +{int(r['earned'])}" if r["earned"] else "")
+        + (f" 剩{r['left_days']}天" if r["left_days"] is not None else "")
+        for r in results
+    )
+    print(f"SUMMARY: ok={ok} repeat={repeat} fail={fail} earned={earned:g} | {accts}")
+
     logger.close()
     return 1 if fail else 0
 
