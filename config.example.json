@@ -1,0 +1,20 @@
+{
+  "_说明_1_获取Cookie": "浏览器登录 https://glados.cloud -> F12 -> Application(应用程序) -> Cookies -> https://glados.cloud，复制 koa:sess 与 koa:sess.sig 两个值，拼成一行：koa:sess=xxx; koa:sess.sig=yyy",
+  "_说明_2_多账号": "cookies 写成数组即可；也可以写成一个字符串，用 & 或换行分隔多个账号",
+  "_说明_3_优先级": "环境变量 GLADOS_COOKIE / GLADOS_COOKIES 会覆盖本文件的 cookies（CI 场景用）",
+  "_说明_4_推送": "notify 下四类通道全部可选，留空即关闭；推送失败不影响签到结果",
+
+  "cookies": [
+    "koa:sess=REPLACE_ME_LONG_VALUE; koa:sess.sig=REPLACE_ME_SHORT_VALUE"
+  ],
+
+  "notify": {
+    "pushplus": "",
+    "serverchan": "",
+    "wecom_webhook": "",
+    "telegram": {
+      "bot_token": "",
+      "chat_id": ""
+    }
+  }
+}

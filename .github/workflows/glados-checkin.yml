@@ -1,0 +1,38 @@
+name: GLaDOS Auto Checkin
+
+on:
+  schedule:
+    # 北京时间 09:30 与 21:30（GitHub Actions 使用 UTC）
+    - cron: "30 1 * * *"
+    - cron: "30 13 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: glados-checkin
+  cancel-in-progress: false
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Selftest (offline)
+        run: python glados_checkin.py --selftest
+
+      - name: Run check-in
+        env:
+          # 在仓库 Settings -> Secrets and variables -> Actions 中新增 COOKIES
+          GLADOS_COOKIE: ${{ secrets.COOKIES }}
+          PUSHPLUS: ${{ secrets.PUSHPLUS }}
+        run: |
+          python glados_checkin.py --quiet
+          echo "exit=$?" >> "$GITHUB_STEP_SUMMARY"

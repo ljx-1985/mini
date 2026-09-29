@@ -1,0 +1,10 @@
+# 本地敏感文件与产物，不要提交
+config.json
+logs/
+_probe.txt
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
