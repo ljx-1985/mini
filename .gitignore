@@ -1,8 +1,10 @@
 # 本地敏感文件与产物，不要提交
 config.json
 logs/
-_probe.txt
 *.log
+
+# 临时调试产物（_p.txt / _check.txt 等）
+_*.txt
 
 # Python
 __pycache__/
